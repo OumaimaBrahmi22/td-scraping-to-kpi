@@ -1,0 +1,20 @@
+
+{
+  "total_postings": 12,
+  "target_skill": "python",
+  "postings_with_target_skill": 2,
+  "target_skill_fraction": 0.16666666666666666,
+  "average_skills_per_posting": 5.583333333333333,
+  "top_10_skills": [
+    ["AI", 4],
+    ["Computer vision", 2],
+    ["Generative AI", 2],
+    ["Python", 2],
+    ["CI/CD", 2],
+    ["HIL", 1],
+    ["MATLAB", 1],
+    ["CAPL", 1],
+    ["C#", 1],
+    ["CAN", 1]
+  ]
+}
