@@ -1,67 +1,61 @@
 
-import json
+import json, time
 from collections import Counter
-from pathlib import Path
 
-INPUT_FILE = Path("data/extracted.json")
-OUTPUT_FILE = Path("docs/data/kpi.json")
-
+# One deliberately simple, deliberately editable KPI definition.
 TARGET_SKILL = "python"
 
+def load_extracted(path="data/extracted.json"):
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)["postings"]
 
-def main():
-    # Load extracted data
-    with open(INPUT_FILE, "r", encoding="utf-8") as file:
-        data = json.load(file)
+def compute_kpi(postings, target_skill=TARGET_SKILL):
+    n = len(postings)
 
-    postings = data["postings"]
-
-    # Count all extracted skills
-    skill_counts = Counter()
-
-    for posting in postings:
-        skills = posting.get("required_skills", [])
-        skill_counts.update(skills)
-
-    # Count postings mentioning the target skill
-    matching_postings = sum(
-        1 for posting in postings
+    matching = [
+        p for p in postings
         if any(
-            TARGET_SKILL.lower() in skill.lower()
-            for skill in posting.get("required_skills", [])
+            target_skill.lower() in s.lower()
+            for s in p.get("required_skills", [])
         )
-    )
+    ]
 
-    total_postings = len(postings)
+    all_skills = Counter()
 
-    # Calculate KPIs
-    kpi = {
-        "total_postings": total_postings,
-        "target_skill": TARGET_SKILL,
-        "postings_with_target_skill": matching_postings,
-        "target_skill_fraction": (
-            matching_postings / total_postings
-            if total_postings else 0
+    for p in postings:
+        for s in p.get("required_skills", []):
+            all_skills[s] += 1
+
+    return {
+        "generated_at": time.strftime(
+            "%Y-%m-%dT%H:%M:%SZ", time.gmtime()
         ),
-        "average_skills_per_posting": (
+        "kpi_label": f"% of postings mentioning '{target_skill}'",
+        "kpi_value": round(len(matching) / n, 3) if n else 0.0,
+        "n_postings_analyzed": n,
+        "n_matching": len(matching),
+        "top_skills": [
+            {"skill": s, "count": c}
+            for s, c in all_skills.most_common(10)
+        ],
+        "avg_skills_per_posting": round(
             sum(
-                len(posting.get("required_skills", []))
-                for posting in postings
-            ) / total_postings
-            if total_postings else 0
-        ),
-        "top_10_skills": skill_counts.most_common(10)
+                len(p.get("required_skills", []))
+                for p in postings
+            ) / n, 2
+        ) if n else 0.0,
     }
 
-    # Save aggregated results
-    OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+def main():
+    postings = load_extracted()
+    kpi = compute_kpi(postings)
 
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as file:
-        json.dump(kpi, file, indent=2, ensure_ascii=False)
+    print(json.dumps(kpi, indent=2))
 
-    print(json.dumps(kpi, indent=2, ensure_ascii=False))
-    print(f"\nKPI saved to {OUTPUT_FILE}")
+    with open("docs/data/kpi.json", "w", encoding="utf-8") as f:
+        json.dump(kpi, f, indent=2)
 
+    print("\nWrote docs/data/kpi.json")
 
 if __name__ == "__main__":
     main()
