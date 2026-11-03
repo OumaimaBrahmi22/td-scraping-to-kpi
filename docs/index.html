@@ -1,0 +1,213 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Job Market Skills Dashboard | Le Mans</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            font-family: Arial, sans-serif;
+            background: #f4f6fa;
+            color: #202b3c;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: auto;
+        }
+
+        header {
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            color: #172b4d;
+        }
+
+        .description {
+            color: #65748b;
+            line-height: 1.6;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fit, minmax(200px, 1fr)
+            );
+            gap: 18px;
+            margin: 25px 0;
+        }
+
+        .card, .chart-container {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        }
+
+        .card h3 {
+            margin: 0 0 12px;
+            font-size: 14px;
+            color: #65748b;
+        }
+
+        .value {
+            font-size: 30px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .chart-container {
+            margin-top: 25px;
+        }
+
+        .chart-container h2 {
+            margin-top: 0;
+            font-size: 19px;
+        }
+
+        #error {
+            color: #b42318;
+            margin-top: 20px;
+        }
+
+        footer {
+            margin-top: 30px;
+            color: #8792a2;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+
+        <header>
+            <h1>Job Market Skills Dashboard</h1>
+
+            <p class="description">
+                An analysis of technical skills extracted from
+                job postings using a Large Language Model (LLM).
+                This dashboard helps explore the skills most
+                frequently mentioned in the selected job sample.
+            </p>
+        </header>
+
+        <section class="cards">
+            <div class="card">
+                <h3>Total job postings</h3>
+                <div class="value" id="total">-</div>
+            </div>
+
+            <div class="card">
+                <h3>Postings mentioning Python</h3>
+                <div class="value" id="matching">-</div>
+            </div>
+
+            <div class="card">
+                <h3>Python job posting fraction</h3>
+                <div class="value" id="fraction">-</div>
+            </div>
+
+            <div class="card">
+                <h3>Average skills per posting</h3>
+                <div class="value" id="average">-</div>
+            </div>
+        </section>
+
+        <section class="chart-container">
+            <h2>Top 10 Most Frequent Technical Skills</h2>
+            <canvas id="skillsChart"></canvas>
+        </section>
+
+        <p id="error"></p>
+
+        <footer>
+            Data source: A sample of job postings.
+            Skills extracted using Ollama and Qwen3.
+            Results represent this sample only.
+        </footer>
+
+    </main>
+
+    <script>
+        async function loadDashboard() {
+            try {
+                const response = await fetch("data/kpi.json");
+
+                if (!response.ok) {
+                    throw new Error("Could not load KPI data.");
+                }
+
+                const data = await response.json();
+
+                document.getElementById("total").textContent =
+                    data.total_postings;
+
+                document.getElementById("matching").textContent =
+                    data.postings_with_target_skill;
+
+                document.getElementById("fraction").textContent =
+                    (data.target_skill_fraction * 100).toFixed(1) + "%";
+
+                document.getElementById("average").textContent =
+                    data.average_skills_per_posting.toFixed(2);
+
+                const labels = data.top_10_skills.map(
+                    item => item[0]
+                );
+
+                const values = data.top_10_skills.map(
+                    item => item[1]
+                );
+
+                new Chart(
+                    document.getElementById("skillsChart"),
+                    {
+                        type: "bar",
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: "Number of job postings",
+                                data: values,
+                                backgroundColor: "#3984c6",
+                                borderRadius: 5
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            indexAxis: "y",
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        precision: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                );
+
+            } catch (error) {
+                document.getElementById("error").textContent =
+                    "Dashboard error: " + error.message;
+            }
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>
