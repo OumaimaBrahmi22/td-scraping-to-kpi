@@ -1,20 +1,50 @@
-
 {
-  "total_postings": 12,
-  "target_skill": "python",
-  "postings_with_target_skill": 2,
-  "target_skill_fraction": 0.16666666666666666,
-  "average_skills_per_posting": 5.583333333333333,
-  "top_10_skills": [
-    ["AI", 4],
-    ["Computer vision", 2],
-    ["Generative AI", 2],
-    ["Python", 2],
-    ["CI/CD", 2],
-    ["HIL", 1],
-    ["MATLAB", 1],
-    ["CAPL", 1],
-    ["C#", 1],
-    ["CAN", 1]
-  ]
+  "generated_at": "2026-11-03T03:24:55Z",
+  "kpi_label": "% of postings mentioning 'python'",
+  "kpi_value": 0.167,
+  "n_postings_analyzed": 12,
+  "n_matching": 2,
+  "top_skills": [
+    {
+      "skill": "AI",
+      "count": 4
+    },
+    {
+      "skill": "Computer vision",
+      "count": 2
+    },
+    {
+      "skill": "Generative AI",
+      "count": 2
+    },
+    {
+      "skill": "Python",
+      "count": 2
+    },
+    {
+      "skill": "CI/CD",
+      "count": 2
+    },
+    {
+      "skill": "HIL",
+      "count": 1
+    },
+    {
+      "skill": "MATLAB",
+      "count": 1
+    },
+    {
+      "skill": "CAPL",
+      "count": 1
+    },
+    {
+      "skill": "C#",
+      "count": 1
+    },
+    {
+      "skill": "CAN",
+      "count": 1
+    }
+  ],
+  "avg_skills_per_posting": 5.58
 }
